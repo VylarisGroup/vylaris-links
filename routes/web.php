@@ -10,12 +10,29 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SetupController;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+
+// Einrichtungsassistent: ohne Session, Cookies und Datenbank (läuft vor der ersten Konfiguration).
+// Geschützt durch ein Token (storage/app/setup-token); nach der Einrichtung gesperrt.
+Route::prefix('setup')->withoutMiddleware([
+    EncryptCookies::class,
+    AddQueuedCookiesToResponse::class,
+    StartSession::class,
+    ShareErrorsFromSession::class,
+    PreventRequestForgery::class,
+])->group(function () {
+    Route::get('/', [SetupController::class, 'index'])->name('setup');
+    Route::post('/api/start', [SetupController::class, 'start']);
+    Route::post('/api/datenbank', [SetupController::class, 'database']);
+    Route::post('/api/mail', [SetupController::class, 'mail']);
+    Route::post('/api/installieren', [SetupController::class, 'install']);
+});
 
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 

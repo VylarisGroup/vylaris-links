@@ -58,7 +58,9 @@
                 </form>
             @else
                 <a href="{{ route('login') }}" class="btn btn-ghost btn-sm">Anmelden</a>
-                <a href="{{ route('register') }}" class="btn btn-primary btn-sm">Konto erstellen</a>
+                @if (config('links.registration_open'))
+                    <a href="{{ route('register') }}" class="btn btn-primary btn-sm">Konto erstellen</a>
+                @endif
             @endauth
         </div>
     </div>

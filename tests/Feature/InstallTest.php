@@ -85,4 +85,16 @@ class InstallTest extends TestCase
         $this->assertTrue((bool) $admin->is_admin);
         $this->assertNotSame('Geheim12345', $admin->password);
     }
+
+    public function test_env_file_output_is_read_back_by_dotenv(): void
+    {
+        $path = $this->dir.'/.env';
+        $env = new EnvFile($path);
+        $env->setMany(['APP_NAME' => 'Mein "Dienst" $HOME', 'DB_PASSWORD' => 'a\\b #c', 'PLAIN' => 'wert']);
+
+        $parsed = \Dotenv\Dotenv::parse((string) file_get_contents($path));
+        $this->assertSame('Mein "Dienst" $HOME', $parsed['APP_NAME']);
+        $this->assertSame('a\\b #c', $parsed['DB_PASSWORD']);
+        $this->assertSame('wert', $parsed['PLAIN']);
+    }
 }

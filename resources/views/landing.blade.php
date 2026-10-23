@@ -14,6 +14,7 @@
         Bau dir in zwei Minuten deine eigene Link-Seite für Instagram, TikTok, YouTube oder Twitch –
         mit Statistik, ohne Werbung und ohne Tracking-Cookies. Kostenlos mit deinem Vylaris-Konto.
     </p>
+    @if (config('links.registration_open'))
     <form action="{{ route('register') }}" method="get" class="mx-auto mt-8 flex max-w-lg flex-col gap-2 sm:flex-row">
         <div class="flex flex-1 items-center rounded-xl border border-line bg-surface px-3.5 focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/30">
             <label for="hero-slug" class="shrink-0 text-sm text-dim">{{ parse_url(config('app.url'), PHP_URL_HOST) }}/</label>
@@ -22,6 +23,7 @@
         </div>
         <button class="btn btn-primary" type="submit">Seite sichern</button>
     </form>
+    @endif
     <ul class="mt-6 flex flex-wrap items-center justify-center gap-2 text-xs text-muted">
         <li class="badge">Kostenlos</li><li class="badge">Ohne Cookies</li><li class="badge">Ohne Werbung</li><li class="badge">Aus der Schweiz</li>
     </ul>
@@ -122,7 +124,11 @@
     <div class="card text-center" style="background: linear-gradient(135deg, rgb(79 140 255 / .14), rgb(124 92 255 / .14))">
         <h2 class="text-3xl font-bold tracking-tight">Bereit für deine Link-Seite?</h2>
         <p class="mt-2 text-muted">Kostenlos mit deinem Konto. In zwei Minuten online.</p>
-        <a href="{{ route('register') }}" class="btn btn-primary mt-6">Kostenlos starten</a>
+        @if (config('links.registration_open'))
+            <a href="{{ route('register') }}" class="btn btn-primary mt-6">Kostenlos starten</a>
+        @else
+            <a href="{{ route('login') }}" class="btn btn-primary mt-6">Anmelden</a>
+        @endif
     </div>
 </section>
 @endsection

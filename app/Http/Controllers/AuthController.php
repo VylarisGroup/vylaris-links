@@ -53,6 +53,10 @@ class AuthController extends Controller
 
     public function showRegister(Request $request)
     {
+        if (! config('links.registration_open')) {
+            return redirect()->route('login')->with('status', 'Die Registrierung ist auf dieser Instanz geschlossen.');
+        }
+
         $wanted = Str::of((string) $request->query('name'))->lower()->replaceMatches('/[^a-z0-9\-]/', '')->limit(40, '')->toString();
         if ($wanted !== '') {
             $request->session()->put('wanted_slug', $wanted);
@@ -63,6 +67,10 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        if (! config('links.registration_open')) {
+            return redirect()->route('login')->with('status', 'Die Registrierung ist auf dieser Instanz geschlossen.');
+        }
+
         $data = $request->validate([
             'name' => ['required', 'string', 'max:80'],
             'email' => ['required', 'email', 'max:120', 'unique:users,email'],

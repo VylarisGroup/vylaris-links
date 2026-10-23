@@ -26,7 +26,17 @@ Landingpage nutzen normale Laravel-Sessions.
 
 ## Einrichtung
 
-### Auf dem Server (empfohlen)
+### Web-Assistent (empfohlen)
+
+1. Das `source-code.zip` des neuesten Releases entpacken (enthält `vendor/` und `public/build`) und den Webserver auf den Ordner `public/` zeigen lassen. Der Ordner `storage/` und `bootstrap/cache/` müssen für den Webserver beschreibbar sein.
+2. Die Seite im Browser öffnen – sie führt automatisch zum Assistenten unter `/setup`.
+3. Das **Einrichtungs-Token** eingeben. Es steht auf dem Server in der Datei `storage/app/setup-token` (Schutz davor, dass ein Fremder die Einrichtung übernimmt). Alternativ lässt sich ein festes Token über `LINKS_SETUP_TOKEN` in der `.env` setzen.
+4. Der Assistent führt durch: Systemprüfung → Datenbank (mit Verbindungstest) → Instanz (Name, Adresse, Betriebsart, Registrierung offen/geschlossen, Seiten pro Konto, Update-Prüfung) → Administrator → E-Mail/SMTP (mit Testmail) → Zusammenfassung → Installation.
+5. Danach ist der Assistent gesperrt (`storage/app/installed.json`, Token gelöscht). Noch den Cron-Eintrag aus dem Abschlussbildschirm einrichten.
+
+Eine bereits laufende Instanz mit Administrator wird beim ersten Aufruf automatisch als eingerichtet erkannt – der Assistent erscheint dort nicht. Läuft die Instanz ohne Administrator, fängt er an dieser Stelle an. Der Assistent arbeitet ohne Cookies, Sessions und Datenbank; geschrieben wird nur die `.env`. Installationen aus Git brauchen vorher `composer install --no-dev` und `npm ci && npm run build` (oder `./setup.sh`).
+
+### Auf dem Server per Skript
 
 1. Das `source-code.zip` des neuesten Releases entpacken (enthält `vendor/` und `public/build`) – oder per `git clone` holen.
 2. Den Webserver auf den Ordner `public/` zeigen lassen.

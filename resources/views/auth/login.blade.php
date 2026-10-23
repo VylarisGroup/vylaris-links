@@ -20,6 +20,8 @@
         <a class="text-brand hover:underline" href="{{ route('password.request') }}">Passwort vergessen?</a>
     </div>
     <button class="btn btn-primary w-full" type="submit">Anmelden</button>
-    <p class="text-center text-sm text-muted">Noch kein Konto? <a class="text-brand hover:underline" href="{{ route('register') }}">Konto erstellen</a></p>
+    @if (config('links.registration_open'))
+        <p class="text-center text-sm text-muted">Noch kein Konto? <a class="text-brand hover:underline" href="{{ route('register') }}">Konto erstellen</a></p>
+    @endif
 </form>
 @endsection

@@ -51,7 +51,7 @@ class Themes
             'admin', 'api', 'anmelden', 'login', 'logout', 'registrieren', 'register', 'passwort', 'dashboard',
             'editor', 'konto', 'go', 'up', 'storage', 'assets', 'css', 'js', 'build', 'static', 'support',
             'impressum', 'datenschutz', 'hilfe', 'help', 'about', 'ueber-uns', 'www', 'mail', 'vylaris',
-            'melden', 'sprache', 'robots', 'sitemap', 'favicon', 'dev',
+            'melden', 'sprache', 'robots', 'sitemap', 'favicon', 'dev', 'setup',
         ], $extra);
     }
 }
