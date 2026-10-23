@@ -26,13 +26,36 @@ Landingpage nutzen normale Laravel-Sessions.
 
 ## Einrichtung
 
+### Auf dem Server (empfohlen)
+
+1. Das `source-code.zip` des neuesten Releases entpacken (enthält `vendor/` und `public/build`) – oder per `git clone` holen.
+2. Den Webserver auf den Ordner `public/` zeigen lassen.
+3. Im Projektordner ausführen:
+
 ```bash
-composer install
+./setup.sh
+```
+
+Das Skript installiert bei Bedarf Composer-Pakete und baut die Assets (nur bei einer Git-Installation), setzt die Verzeichnisrechte und startet `php artisan links:install`. Dieser Befehl fragt Adresse, Datenbank, optional SMTP und das Admin-Konto ab und erledigt `.env`, `APP_KEY`, Datenbank anlegen (falls erlaubt), Migrationen, `storage:link` und die Produktions-Caches. Er lässt sich gefahrlos erneut ausführen; vorhandene Werte bleiben erhalten.
+
+Ohne Rückfragen (z. B. für Skripte):
+
+```bash
+LINKS_DB_PASSWORD='…' LINKS_ADMIN_PASSWORD='…' ./setup.sh --url=https://links.example.ch \
+  --db-name=vylaris_links --db-user=links --admin-email=du@example.ch --no-interaction
+```
+
+Mit `php artisan links:install --check` wird nur geprüft (PHP, Erweiterungen, `.env`, Schlüssel, Datenbank, Migrationen, Rechte, Assets) – hilfreich bei einem Fehler 500.
+
+### Manuell
+
+```bash
+composer install --no-dev --optimize-autoloader
 cp .env.example .env        # DB_*, MAIL_*, APP_URL anpassen
 php artisan key:generate
-php artisan migrate
+php artisan migrate --force
 php artisan storage:link
-npm install && npm run build
+npm ci && npm run build
 php artisan links:make-admin deine@mail.ch   # nach der Registrierung
 ```
 
