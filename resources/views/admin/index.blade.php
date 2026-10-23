@@ -3,7 +3,12 @@
 @section('content')
 <div class="container-v py-12">
     <p class="eyebrow">Admin</p>
-    <h1 class="mt-3 text-3xl font-bold tracking-tight">Moderation</h1>
+    <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
+        <h1 class="text-3xl font-bold tracking-tight">Moderation</h1>
+        <a href="{{ route('admin.update') }}" class="btn btn-ghost btn-sm">Updates
+            @if (app(\App\Support\Updater\Updater::class)->updateAvailable())<span class="rounded-full bg-emerald-500 px-1.5 text-[10px] text-white">neu</span>@endif
+        </a>
+    </div>
     <dl class="mt-6 grid grid-cols-3 gap-3 sm:max-w-md">
         <div class="card p-3 text-center"><dt class="text-xs text-dim">Konten</dt><dd class="text-xl font-bold">{{ $counts['users'] }}</dd></div>
         <div class="card p-3 text-center"><dt class="text-xs text-dim">Seiten</dt><dd class="text-xl font-bold">{{ $counts['pages'] }}</dd></div>

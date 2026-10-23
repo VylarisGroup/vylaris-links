@@ -1,0 +1,49 @@
+name: Release-Paket bauen
+
+# Sobald ein Release veröffentlicht wird, baut dieser Workflow den fertigen Stand
+# (inkl. vendor/ und public/build) und hängt ihn als "source-code.zip" an das Release.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, pdo_mysql, zip, gd, fileinfo
+          tools: composer:v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Version aus dem Tag übernehmen
+        run: echo "${GITHUB_REF_NAME#v}" > VERSION
+
+      - name: PHP-Abhängigkeiten (ohne Dev)
+        run: composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+
+      - name: Assets bauen
+        run: |
+          npm ci
+          npm run build
+
+      - name: source-code.zip packen
+        run: |
+          zip -qr source-code.zip . \
+            -x ".git/*" ".github/*" "node_modules/*" "tests/*" "storage/*" ".env" \
+               "database/*.sqlite" "source-code.zip" "AGENTS.md" "CLAUDE.md"
+
+      - name: An das Release anhängen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$GITHUB_REF_NAME" source-code.zip --clobber

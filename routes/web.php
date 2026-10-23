@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\UpdateController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
@@ -66,6 +67,10 @@ Route::prefix('admin')->middleware(['auth', 'not.blocked', 'admin'])->group(func
     Route::post('/seiten/{page}/freigeben', [AdminController::class, 'unblockPage'])->name('admin.pages.unblock');
     Route::post('/konten/{user}/sperren', [AdminController::class, 'blockUser'])->name('admin.users.block');
     Route::post('/konten/{user}/freigeben', [AdminController::class, 'unblockUser'])->name('admin.users.unblock');
+    Route::get('/update', [UpdateController::class, 'index'])->name('admin.update');
+    Route::post('/update/pruefen', [UpdateController::class, 'check'])->middleware('throttle:10,1')->name('admin.update.check');
+    Route::post('/update/installieren', [UpdateController::class, 'install'])->middleware('throttle:3,10')->name('admin.update.install');
+    Route::get('/update/status', [UpdateController::class, 'status'])->name('admin.update.status');
     Route::post('/meldungen/{report}/abweisen', [AdminController::class, 'dismissReport'])->name('admin.reports.dismiss');
 });
 

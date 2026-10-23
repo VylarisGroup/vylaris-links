@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => EnsureAdmin::class,
             'not.blocked' => EnsureNotBlocked::class,
         ]);
+        $middleware->preventRequestsDuringMaintenance(except: ['admin/update/status']);
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo(fn () => route('dashboard'));
     })

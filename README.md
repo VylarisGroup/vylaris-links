@@ -15,6 +15,7 @@ Kostenlos, ohne Werbung, ohne Tracking-Cookies auf den öffentlichen Profilseite
 - Cookielose Statistik ohne IP-Adressen (Tageszähler, Gerät, Herkunft, optional Land per `CF-IPCountry`)
 - Wochenbericht per E-Mail (`links:weekly-report`, montags 07:30 Europe/Zurich)
 - Melden-Funktion für Besucher, Admin-Bereich zum Sperren von Seiten und Konten
+- Automatisches Update-System aus der `source-code.zip` eines GitHub-Releases (siehe unten)
 
 ## Datenschutz-Konzept
 
@@ -47,6 +48,31 @@ Für den Wochenbericht muss der Scheduler laufen:
 composer run dev        # oder: php artisan serve + npm run dev
 php artisan test
 ```
+
+## Update-System
+
+Der Admin-Bereich (**Admin → Updates**) und der Befehl `php artisan links:update` aktualisieren die Anwendung
+aus der Datei `source-code.zip`, die am neuesten Release von `UPDATER_REPO` hängt (Standard: `VylarisGroup/vylaris-links`).
+
+**Ablauf:** Release prüfen → Zip herunterladen (nur von GitHub-Hosts) → Grösse und SHA-256 prüfen → Paket auf unsichere
+Pfade, Symlinks und Zip-Bomben prüfen → entpacken → Datenbank sichern → Wartungsmodus → Dateien austauschen →
+`migrate` und `optimize:clear` → Wartungsmodus aus. Schlägt ein Schritt fehl, werden Migrationen und Dateien
+automatisch zurückgesetzt. Die Sicherungen (Dateien und Datenbank, MySQL/MariaDB als `.sql.gz`, SQLite als Kopie)
+liegen in `storage/app/updater/backups`, die letzten 3 bleiben erhalten.
+
+**Wann:** Der Scheduler prüft jede Nacht um 03:15 auf neue Releases. Installiert wird nur per Klick im Admin-Bereich
+oder per `php artisan links:update`. Der Admin-Link zeigt einen grünen Punkt, wenn ein Update bereitsteht.
+
+**Nie angefasst werden:** `.env`, `storage/`, `node_modules/`, `.git`, `public/storage`, `bootstrap/cache`
+und SQLite-Dateien in `database/`.
+
+**Release veröffentlichen:** Release mit Tag (z. B. `v1.1.0`) auf GitHub veröffentlichen. Der Workflow
+`.github/workflows/release.yml` baut dann den fertigen Stand (mit `vendor/` und `public/build`, `VERSION` aus dem Tag)
+und hängt ihn als `source-code.zip` an. Die installierte Version steht in der Datei `VERSION`.
+
+Einstellungen in `.env`: `UPDATER_ENABLED`, `UPDATER_REPO`, `UPDATER_KEEP_BACKUPS`, optional `UPDATER_GITHUB_TOKEN`.
+Voraussetzungen: PHP-Erweiterung `zip`, vom Webserver beschreibbarer Projektordner, rund 400 MB freier Platz.
+Ein manueller Rollback ist möglich, indem der Inhalt von `backups/<Datum>/files` zurückkopiert und die Datenbank-Sicherung eingespielt wird.
 
 ## Hinweise
 

@@ -47,7 +47,9 @@
         <div class="flex items-center gap-2">
             @auth
                 @if (auth()->user()->is_admin)
-                    <a href="{{ route('admin.index') }}" class="btn btn-ghost btn-sm">Admin</a>
+                    <a href="{{ route('admin.index') }}" class="btn btn-ghost btn-sm">Admin
+                        @if (app(\App\Support\Updater\Updater::class)->updateAvailable())<span class="ml-1 h-2 w-2 rounded-full bg-emerald-400" title="Update verfügbar"><span class="sr-only">Update verfügbar</span></span>@endif
+                    </a>
                 @endif
                 <a href="{{ route('dashboard') }}" class="btn btn-ghost btn-sm">Meine Seiten</a>
                 <a href="{{ route('account') }}" class="btn btn-ghost btn-sm hidden sm:inline-flex">Konto</a>
@@ -89,7 +91,7 @@
             <li><a class="hover:text-fg" href="https://discord.gg/2AMZtStBQa" target="_blank" rel="noopener">Discord</a></li>
         </ul>
     </div>
-    <div class="container-v pb-8 text-xs text-dim">© {{ date('Y') }} VylarisGroup Schweiz</div>
+    <div class="container-v pb-8 text-xs text-dim">© {{ date('Y') }} VylarisGroup Schweiz · v{{ config('updater.version') }}</div>
 </footer>
 @stack('scripts')
 </body>
