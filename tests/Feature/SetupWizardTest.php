@@ -180,4 +180,16 @@ class SetupWizardTest extends TestCase
     {
         $this->assertFalse(SetupState::isInstalled());
     }
+
+    public function test_errors_name_their_cause_only_before_setup_is_done(): void
+    {
+        \Illuminate\Support\Facades\Route::get('/setup/boom', fn () => throw new \RuntimeException('kaputt-xyz'));
+
+        $this->get('/setup/boom')->assertStatus(500)->assertSee('RuntimeException: kaputt-xyz', false);
+        $this->getJson('/setup/boom')->assertStatus(500)->assertJsonPath('message', fn ($m) => str_contains($m, 'kaputt-xyz'));
+
+        file_put_contents($this->dir.'/installed.json', '{}');
+        config(['app.debug' => false]); // wie in Produktion
+        $this->get('/setup/boom')->assertStatus(500)->assertDontSee('kaputt-xyz', false);
+    }
 }
