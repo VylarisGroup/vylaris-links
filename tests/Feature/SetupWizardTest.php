@@ -151,6 +151,8 @@ class SetupWizardTest extends TestCase
         $this->assertSame('log', $env->get('MAIL_MAILER'));
         $this->assertStringStartsWith('base64:', (string) $env->get('APP_KEY'));
         $this->assertSame('sqlite', $env->get('DB_CONNECTION'));
+        $this->assertSame(40, strlen((string) $env->get('LINKS_CRON_TOKEN')));
+        $this->assertSame('https://links.example.ch/cron/'.$env->get('LINKS_CRON_TOKEN'), $r->json('cron_url'));
 
         $admin = User::where('email', 'chef@example.ch')->first();
         $this->assertNotNull($admin);

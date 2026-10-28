@@ -334,6 +334,7 @@
         if (r.data.ok) {
             renderSteps($('#done-log'), r.data.steps);
             $('#cron').textContent = r.data.cron;
+            $('#cron-url').textContent = r.data.cron_url || '';
             if (/^https?:\/\//.test(r.data.login)) $('#login-link').href = r.data.login;
             show(7);
             return;

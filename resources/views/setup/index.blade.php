@@ -181,10 +181,15 @@
     <section class="card" data-step="7" hidden>
         <h2 tabindex="-1">Fertig – deine Instanz läuft</h2>
         <ul class="checks" id="done-log"></ul>
-        <p>Der Assistent ist jetzt gesperrt, das Token gelöscht. Noch zwei Dinge auf dem Server:</p>
+        <p>Der Assistent ist jetzt gesperrt, das Token gelöscht. Noch zwei Dinge:</p>
         <ol class="todo">
             <li>Stelle sicher, dass der Webserver auf den Ordner <code>public/</code> zeigt.</li>
-            <li>Richte diesen Cron-Eintrag ein (Wochenbericht, nächtliche Update-Prüfung):<pre><code id="cron"></code></pre></li>
+            <li>Richte den Cron ein (Wochenbericht, nächtliche Update-Prüfung) – <strong>eine</strong> der beiden Möglichkeiten:
+                <ul>
+                    <li>Per Adresse (z. B. mit cron-job.org, jede Minute aufrufen). Gib sie nicht weiter:<pre><code id="cron-url"></code></pre></li>
+                    <li>Oder als Cron-Eintrag auf dem Server:<pre><code id="cron"></code></pre></li>
+                </ul>
+            </li>
         </ol>
         <div class="nav"><span></span><a class="btn primary" id="login-link" href="/anmelden">Zur Anmeldung</a></div>
     </section>

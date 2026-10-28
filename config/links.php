@@ -8,6 +8,11 @@ return [
     // Neue Konten dürfen sich selbst registrieren ("closed" = nur der Administrator legt Konten an).
     'registration_open' => env('LINKS_REGISTRATION', 'open') !== 'closed',
 
+    // Cron per URL: /cron/{token} führt den Scheduler aus. Ohne Token (oder unter 32 Zeichen) ist der Aufruf abgeschaltet.
+    'cron' => [
+        'token' => env('LINKS_CRON_TOKEN'),
+    ],
+
     // Einrichtungsassistent (/setup). Nach der Einrichtung ist er gesperrt.
     'setup' => [
         'enabled' => (bool) env('LINKS_SETUP', true),

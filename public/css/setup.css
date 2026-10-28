@@ -94,3 +94,5 @@ input[type=radio], input[type=checkbox] { flex: none; width: 17px; height: 17px;
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 [hidden] { display: none !important; }
 @media (prefers-reduced-motion: no-preference) { .card { animation: rise .25s ease-out; } @keyframes rise { from { opacity: 0; transform: translateY(6px); } } }
+
+.todo ul { margin: 8px 0 0; padding-left: 18px; }

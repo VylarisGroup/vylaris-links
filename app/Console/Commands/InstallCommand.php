@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
+use App\Support\Cron;
 use App\Support\EnvFile;
 use App\Support\Install\InstanceInstaller;
 use App\Support\Install\Requirements;
@@ -81,8 +82,11 @@ class InstallCommand extends Command
         $this->newLine();
         $this->line('<options=bold>Noch zu tun:</>');
         $this->line('  • Webserver auf den Ordner <info>public/</info> zeigen lassen.');
-        $this->line('  • Cron für den Scheduler (Wochenbericht, nächtliche Update-Prüfung):');
+        $this->line('  • Cron für den Scheduler (Wochenbericht, nächtliche Update-Prüfung) – eine der Möglichkeiten:');
         $this->line('    <comment>* * * * * cd '.base_path().' && php artisan schedule:run >> /dev/null 2>&1</comment>');
+        if ($cronUrl = Cron::url($this->env->get('APP_URL'), $this->env->get('LINKS_CRON_TOKEN'))) {
+            $this->line('    oder diese Adresse jede Minute aufrufen: <comment>'.$cronUrl.'</comment>');
+        }
 
         return $code;
     }

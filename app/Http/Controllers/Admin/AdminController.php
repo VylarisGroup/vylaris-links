@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Page;
 use App\Models\Report;
 use App\Models\User;
+use App\Support\Cron;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
@@ -15,6 +16,7 @@ class AdminController extends Controller
         return view('admin.index', [
             'openReports' => Report::where('status', 'open')->with('page.user')->latest()->limit(50)->get(),
             'pages' => Page::with('user')->latest()->paginate(25, ['*'], 'seiten'),
+            'cron' => ['url' => Cron::url(), 'last' => Cron::lastRun()],
             'counts' => ['users' => User::count(), 'pages' => Page::count(), 'blocked' => Page::whereNotNull('blocked_at')->count()],
         ]);
     }

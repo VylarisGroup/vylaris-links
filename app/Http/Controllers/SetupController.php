@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\Cron;
 use App\Support\EnvFile;
 use App\Support\Install\DatabaseProbe;
 use App\Support\Install\InstanceInstaller;
@@ -165,6 +166,7 @@ class SetupController extends Controller
             'ok' => $ok,
             'steps' => $steps,
             'login' => rtrim($i['url'], '/').'/anmelden',
+            'cron_url' => Cron::url($i['url'], (new EnvFile(app()->environmentFilePath()))->get('LINKS_CRON_TOKEN')),
             'cron' => '* * * * * cd '.base_path().' && php artisan schedule:run >> /dev/null 2>&1',
         ]);
     }

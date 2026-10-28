@@ -69,7 +69,13 @@ npm ci && npm run build
 php artisan links:make-admin deine@mail.ch   # nach der Registrierung
 ```
 
-Für den Wochenbericht muss der Scheduler laufen:
+### Cron
+
+Wochenbericht (Montag 07:30) und Update-Prüfung (nachts 03:15) laufen über den Scheduler. Er braucht einen Aufruf **jede Minute** (mindestens alle 5 Minuten, sonst werden diese Zeitpunkte verpasst). Zwei Möglichkeiten, eine genügt:
+
+**Per Adresse** – für Hoster ohne Cron oder mit externen Diensten wie cron-job.org: Rufe `https://deine-domain/cron/<Token>` jede Minute auf (GET, HEAD oder POST). Die Adresse wird bei der Einrichtung erzeugt und steht im Admin-Bereich (mit Zeitpunkt des letzten Aufrufs). Mit `php artisan links:cron-token` zeigst du sie an oder legst bei einer älteren Installation ein Token an, mit `--regenerate` erzeugst du ein neues (die alte Adresse ist dann ungültig). Das Token muss mindestens 32 Zeichen haben (`LINKS_CRON_TOKEN` in der `.env`); ohne Token antwortet die Adresse mit 404. Parallele Aufrufe werden übersprungen.
+
+**Per Cron-Eintrag** auf dem Server:
 
 ```cron
 * * * * * cd /pfad/zum/projekt && php artisan schedule:run >> /dev/null 2>&1

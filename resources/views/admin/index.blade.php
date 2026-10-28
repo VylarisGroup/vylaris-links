@@ -15,6 +15,31 @@
         <div class="card p-3 text-center"><dt class="text-xs text-dim">Gesperrt</dt><dd class="text-xl font-bold">{{ $counts['blocked'] }}</dd></div>
     </dl>
 
+
+    <section class="card mt-6" aria-labelledby="cron-h">
+        <h2 id="cron-h" class="text-lg font-semibold">Cron per URL</h2>
+        @if ($cron['url'])
+            <p class="mt-1 text-sm text-muted">Lass diese Adresse <strong>jede Minute</strong> aufrufen (z. B. mit cron-job.org). Sie startet Wochenbericht und Update-Prüfung. Gib die Adresse nicht weiter.</p>
+            <div class="mt-3 flex flex-wrap items-center gap-2">
+                <code class="min-w-0 flex-1 break-all rounded-lg bg-surface-2 px-3 py-2 text-xs">{{ $cron['url'] }}</code>
+                <button type="button" class="btn btn-ghost btn-sm" x-data="{ done: false }" data-url="{{ $cron['url'] }}"
+                        @click="navigator.clipboard.writeText($el.dataset.url).then(() => { done = true; setTimeout(() => done = false, 1500) })"
+                        x-text="done ? 'Kopiert' : 'Kopieren'">Kopieren</button>
+            </div>
+            @php($ago = $cron['last'] ? now()->diffInMinutes(\Illuminate\Support\Carbon::createFromTimestamp($cron['last'])) : null)
+            <p class="mt-3 text-sm {{ $ago === null || $ago > 10 ? 'text-amber-300' : 'text-emerald-300' }}">
+                @if ($cron['last'])
+                    Letzter Aufruf: {{ \Illuminate\Support\Carbon::createFromTimestamp($cron['last'])->timezone(config('app.timezone'))->format('d.m.Y H:i') }} Uhr
+                    @if ($ago > 10) – länger als 10 Minuten her, prüfe den Cron-Dienst. @endif
+                @else
+                    Noch nie aufgerufen.
+                @endif
+            </p>
+        @else
+            <p class="mt-1 text-sm text-muted">Noch nicht eingerichtet. Auf dem Server <code>php artisan links:cron-token</code> ausführen, dann erscheint hier die Adresse.</p>
+        @endif
+    </section>
+
     <h2 class="mt-10 text-xl font-semibold">Offene Meldungen ({{ $openReports->count() }})</h2>
     <div class="mt-4 space-y-3">
         @forelse ($openReports as $r)

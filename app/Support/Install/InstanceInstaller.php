@@ -9,8 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
-use Symfony\Component\Process\PhpExecutableFinder;
-use Symfony\Component\Process\Process;
+use Illuminate\Support\Str;
 
 /**
  * Richtet eine Instanz ein. Wird vom Web-Assistenten (/setup) und von "php artisan links:install" genutzt.
@@ -108,6 +107,10 @@ class InstanceInstaller
         }
         if (isset($c['updates'])) {
             $pairs['UPDATER_ENABLED'] = $c['updates'] ? 'true' : 'false';
+        }
+        if (! $this->env->get('LINKS_CRON_TOKEN')) {
+            $pairs['LINKS_CRON_TOKEN'] = Str::random(40);
+            config(['links.cron.token' => $pairs['LINKS_CRON_TOKEN']]);
         }
         $this->env->setMany($pairs);
 
@@ -289,32 +292,13 @@ class InstanceInstaller
         return $admin['email'].' angelegt';
     }
 
-    private function optimize(array $c): string|array
+    private function optimize(array $c): array
     {
         if (($c['optimize'] ?? true) === false) {
-            return 'übersprungen';
-        }
-        if (config('app.env') !== 'production') {
-            Artisan::call('optimize:clear');
-
-            return 'Zwischenspeicher geleert (Entwicklungsmodus)';
+            return ['ok', 'übersprungen'];
         }
 
-        // Eigener Prozess: liest die frisch geschriebene .env sauber ein.
-        $php = (new PhpExecutableFinder)->find(false);
-        if (! $php || ! function_exists('proc_open')) {
-            return ['warn', 'Übersprungen (kein PHP-Prozess möglich). Später: php artisan optimize'];
-        }
-        try {
-            $p = new Process([$php, base_path('artisan'), 'optimize'], base_path(), null, null, 120);
-            $p->run();
-            if ($p->isSuccessful()) {
-                return 'Konfiguration, Routen und Ansichten zwischengespeichert';
-            }
-        } catch (\Throwable) {
-        }
-
-        return ['warn', 'Der Cache-Aufbau ist fehlgeschlagen und wird übersprungen. Später: php artisan optimize'];
+        return Caches::rebuild();
     }
 
     private function finish(): string|array

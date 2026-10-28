@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\UpdateController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CronController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EditorController;
 use App\Http\Controllers\ItemController;
@@ -100,6 +101,10 @@ Route::withoutMiddleware([
     ShareErrorsFromSession::class,
     PreventRequestForgery::class,
 ])->group(function () {
+    // Cron per URL (z. B. cron-job.org): führt den Scheduler aus, geschützt durch das Token in der Adresse
+    Route::match(['get', 'head', 'post'], '/cron/{token}', [CronController::class, 'run'])
+        ->where('token', '[A-Za-z0-9]{32,128}')->middleware('throttle:30,1')->name('cron');
+
     Route::get('/go/{item}', [ProfileController::class, 'go'])->whereNumber('item')->name('go');
     Route::post('/go/{item}', [ProfileController::class, 'unlock'])->whereNumber('item')->middleware('throttle:20,1')->name('go.unlock');
 
