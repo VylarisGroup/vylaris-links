@@ -50,6 +50,27 @@ if (! is_file($root.'/vendor/autoload.php')) {
     );
 }
 
+// Laufzeit-Ordner anlegen und prüfen: Darf der Webserver-Benutzer dort nicht schreiben, bricht Laravel ohne jede
+// Meldung ab ("Class view does not exist", leerer 500). Das kommt vor, wenn die Dateien einem anderen Benutzer gehören.
+foreach (['storage/app/public', 'storage/framework/cache/data', 'storage/framework/sessions', 'storage/framework/views', 'storage/logs', 'bootstrap/cache'] as $dir) {
+    if (! is_dir($root.'/'.$dir)) {
+        @mkdir($root.'/'.$dir, 0775, true);
+    }
+}
+$locked = array_values(array_filter(
+    ['bootstrap/cache', 'storage', 'storage/framework', 'storage/logs'],
+    fn ($dir) => ! is_dir($root.'/'.$dir) || ! is_writable($root.'/'.$dir),
+));
+if ($locked) {
+    $who = function_exists('posix_getpwuid') && function_exists('posix_geteuid') ? (posix_getpwuid(posix_geteuid())['name'] ?? '') : '';
+    $who = $who !== '' ? $who : get_current_user();
+    vylarisStartupFailure(
+        'Der Webserver darf nicht in den Projektordner schreiben',
+        'Der PHP-Benutzer „'.$who.'“ darf hier nicht schreiben: '.implode(', ', $locked).'. Die Dateien gehören vermutlich einem anderen Benutzer (z. B. weil sie als root hochgeladen wurden).',
+        'Auf dem Server ausführen: cd '.$root.' && chown -R '.$who.' storage bootstrap/cache && chmod -R ug+rwX storage bootstrap/cache',
+    );
+}
+
 // Determine if the application is in maintenance mode...
 if (file_exists($maintenance = $root.'/storage/framework/maintenance.php')) {
     require $maintenance;

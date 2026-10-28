@@ -29,19 +29,34 @@ class Requirements
         $add('PHP-Erweiterung intl', extension_loaded('intl') ? 'ok' : 'warn', 'Empfohlen für saubere Textverarbeitung.');
         $add('Prozesse starten (proc_open)', function_exists('proc_open') ? 'ok' : 'warn', 'Ohne proc_open laufen Update und Cache-Aufbau eingeschränkt.');
 
+        $user = self::phpUser();
+        $base = base_path();
         $envPath = $env?->path() ?? app()->environmentFilePath();
         $envWritable = is_file($envPath) ? is_writable($envPath) : is_writable(dirname($envPath));
-        $add('.env-Datei beschreibbar', $envWritable ? 'ok' : 'fail', 'Der Webserver-Benutzer muss die Datei .env anlegen und ändern dürfen.');
+        $add('.env-Datei beschreibbar', $envWritable ? 'ok' : 'fail', "Auf dem Server ausführen: cd {$base} && touch .env && chown {$user} .env");
 
         foreach (['storage', 'storage/framework', 'storage/logs', 'bootstrap/cache'] as $d) {
-            $add("{$d} beschreibbar", is_writable(base_path($d)) ? 'ok' : 'fail', "chmod -R ug+w {$d} und den Besitzer des Webservers setzen.");
+            $add("{$d} beschreibbar", is_writable(base_path($d)) ? 'ok' : 'fail', "Auf dem Server ausführen: cd {$base} && chown -R {$user} storage bootstrap/cache && chmod -R ug+rwX storage bootstrap/cache");
         }
 
         $assets = is_file(public_path('build/manifest.json')) || is_file(public_path('hot'));
         $add('Fertige Assets (public/build)', $assets ? 'ok' : 'fail', 'Fehlt: Die Seite würde mit Fehler 500 antworten. Nimm das source-code.zip aus dem Release oder führe "npm ci && npm run build" aus.');
-        $add('Speicher-Link (public/storage)', file_exists(public_path('storage')) ? 'ok' : 'warn', 'Wird bei der Installation angelegt, sonst sind hochgeladene Bilder nicht sichtbar.');
+        $add('Speicher-Link (public/storage)', file_exists(public_path('storage')) ? 'ok' : 'warn', 'Wird bei der Installation angelegt. Gelingt das nicht, den Link von Hand setzen: php artisan storage:link');
 
         return $rows;
+    }
+
+    /** Benutzer, unter dem PHP läuft – ihm müssen die Schreibrechte gehören. */
+    public static function phpUser(): string
+    {
+        if (function_exists('posix_getpwuid') && function_exists('posix_geteuid')) {
+            $name = posix_getpwuid(posix_geteuid())['name'] ?? '';
+            if ($name !== '') {
+                return $name;
+            }
+        }
+
+        return get_current_user() ?: 'www-data';
     }
 
     public static function blocking(array $rows): int

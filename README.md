@@ -75,6 +75,19 @@ Für den Wochenbericht muss der Scheduler laufen:
 * * * * * cd /pfad/zum/projekt && php artisan schedule:run >> /dev/null 2>&1
 ```
 
+## Fehlersuche: leere Seite oder Fehler 500 vor dem Setup
+
+`public/index.php` prüft vor dem Start PHP-Version, Erweiterungen, `vendor/`, die `.env` (mit Zeilennummer) und die Schreibrechte und zeigt statt eines leeren 500 eine verständliche Seite mit dem passenden Befehl. Der häufigste Fall: Die Dateien gehören einem anderen Benutzer als dem Webserver (z. B. als root hochgeladen). Dann hilft:
+
+```bash
+cd /pfad/zum/projekt
+chown -R www-data storage bootstrap/cache      # www-data = Benutzer von PHP/Webserver
+chmod -R ug+rwX storage bootstrap/cache
+touch .env && chown www-data .env              # damit der Assistent die .env schreiben kann
+```
+
+Bleibt die Seite trotzdem leer, geschieht der Fehler vor PHP (Dokumentwurzel, Webserver- oder `.htaccess`-Konfiguration): dann steht die Ursache im Fehlerlog des Webservers.
+
 ## Entwicklung und Tests
 
 ```bash
